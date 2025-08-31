@@ -22,9 +22,11 @@
     <h2>Files in selected group</h2>
     <div class="controls">
       <label>GOP seconds: <input id="gopSec" type="number" min="0" step="0.001" value="0.500" /></label>
+      <button id="btnAuto">Auto‑detect</button>
       <button id="btnSave">Save As…</button>
       <button id="btnMerge" disabled>Start Merge</button>
     </div>
+    <div id="autoInfo" class="muted"></div>
     <ol id="fileList"></ol>
   </section>
 

@@ -4,9 +4,13 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
 const ffmpegPath = require('ffmpeg-static');
+const ffprobePath = require('ffprobe-static').path;
 
 if (!ffmpegPath) {
   console.error('ffmpeg binary not found via ffmpeg-static');
+}
+if (!ffprobePath) {
+  console.error('ffprobe binary not found via ffprobe-static');
 }
 
 function createWindow() {
@@ -68,6 +72,67 @@ function writeConcatList(tempDir, files, gopSec) {
   return listPath;
 }
 
+function run(cmd, args) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(cmd, args, { windowsHide: true });
+    let out = '';
+    let err = '';
+    proc.stdout.on('data', d => out += d.toString());
+    proc.stderr.on('data', d => err += d.toString());
+    proc.on('close', code => {
+      if (code === 0) resolve({ out, err });
+      else reject(new Error(err || ('code ' + code)));
+    });
+  });
+}
+
+async function getFps(firstFile) {
+  const { out } = await run(ffprobePath, [
+    '-v','error',
+    '-select_streams','v:0',
+    '-show_entries','stream=avg_frame_rate',
+    '-of','default=nokey=1:noprint_wrappers=1',
+    firstFile
+  ]);
+  const frac = out.trim(); // e.g. '10000/357'
+  const [num, den] = frac.split('/').map(x => parseFloat(x));
+  if (!num || !den) throw new Error('Cannot parse avg_frame_rate: '+frac);
+  return num/den;
+}
+
+async function getGopFrames(firstFile) {
+  // Look for distance between first two I-frames (<= 400 frames to keep fast)
+  const { out } = await run(ffprobePath, [
+    '-v','error',
+    '-select_streams','v:0',
+    '-show_frames',
+    '-show_entries','frame=pict_type',
+    '-of','csv=p=0',
+    firstFile
+  ]);
+  const lines = out.split(/\n/).filter(Boolean);
+  let firstI = -1;
+  for (let i=0;i<Math.min(lines.length, 400);i++) {
+    if (lines[i].trim() === 'I') { firstI = i; break; }
+  }
+  if (firstI < 0) throw new Error('No I-frame found');
+  for (let j = firstI+1; j < Math.min(lines.length, 400); j++) {
+    if (lines[j].trim() === 'I') {
+      return j - firstI; // GOP length in frames
+    }
+  }
+  throw new Error('Second I-frame not found within first 400 frames');
+}
+
+async function autoDetectGopSeconds(firstFile) {
+  const [fps, gopFrames] = await Promise.all([
+    getFps(firstFile),
+    getGopFrames(firstFile)
+  ]);
+  const sec = gopFrames / fps; // e.g., 14 / 28.011 ≈ 0.5
+  return { fps, gopFrames, sec };
+}
+
 function runFfmpegConcat(listPath, outPath, onData) {
   return new Promise((resolve, reject) => {
     const args = ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', outPath];
@@ -107,6 +172,13 @@ ipcMain.handle('choose-save', async (evt, { suggestedName }) => {
   });
   if (res.canceled || !res.filePath) return null;
   return res.filePath;
+});
+
+ipcMain.handle('auto-gop', async (evt, { files }) => {
+  if (!files || files.length === 0) throw new Error('no files to analyze');
+  const firstFile = files[0];
+  const r = await autoDetectGopSeconds(firstFile);
+  return r; // { fps, gopFrames, sec }
 });
 
 ipcMain.handle('start-merge', async (evt, { files, gopSec, outPath }) => {

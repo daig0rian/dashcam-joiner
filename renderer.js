@@ -28,6 +28,7 @@ function renderGroups() {
     r.addEventListener('change', async () => {
       state.selectedKey = g.key;
       state.files = await window.api.listGroupFiles(state.dir, g.key);
+      $('#autoInfo').textContent = '';
       renderFiles();
     });
     if (g.key === state.selectedKey) r.checked = true;
@@ -59,6 +60,7 @@ $('#btnChoose').addEventListener('click', async () => {
   state.files = [];
   state.outPath = null;
   $('#console').textContent = '';
+  $('#autoInfo').textContent = '';
   renderGroups();
   renderFiles();
 });
@@ -79,6 +81,20 @@ $('#btnMerge').addEventListener('click', async () => {
   $('#btnMerge').disabled = true;
   log(`Merging ${state.files.length} files with GOP cut = ${gopSec.toFixed(3)}s`);
   await window.api.startMerge(state.files, gopSec, state.outPath);
+});
+
+$('#btnAuto').addEventListener('click', async () => {
+  if (!state.files || state.files.length === 0) { alert('Pick a group first'); return; }
+  try {
+    $('#autoInfo').textContent = 'Detecting…';
+    const r = await window.api.autoGop(state.files);
+    $('#gopSec').value = r.sec.toFixed(3);
+    $('#autoInfo').textContent = `Detected: GOP ${r.gopFrames} frames @ ${r.fps.toFixed(3)} fps → ${r.sec.toFixed(3)} s`;
+    log(`[Auto] fps=${r.fps.toFixed(3)}, gopFrames=${r.gopFrames}, gopSec=${r.sec.toFixed(3)}s`);
+  } catch (e) {
+    $('#autoInfo').textContent = 'Auto-detect failed: ' + e.message;
+    log('[Auto] failed: ' + e.message);
+  }
 });
 
 window.api.onLog(msg => log(msg));

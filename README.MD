@@ -1,12 +1,14 @@
 # Dashcam Joiner (Electron + ffmpeg) — 1‑GOP cut, lossless concat
 # ドラレコ結合ツール (Electron + ffmpeg) — 1-GOP 単位のカット、ロスレス結合
-*Tested with MITSUBA EDR-22G
-*MITSUBA  EDR-22Gでテスト済
-*Select a folder → auto‑group MP4s by prefix (e.g., `F_20250828184000`) → pick a group → cut 1 GOP from every file except the first → concat with ffmpeg **without re‑encode**.*
-*フォルダを選択 → MP4ファイルをプレフィックスで自動グループ化 (例: `F_20250828184000`) → グループを選択 → 先頭ファイルを除く全ファイルから1 GOPをカット → ffmpegで**再エンコードなしで**結合*
 
-> The default setting is 1 GOP = 0.5 seconds, but you can use the Auto-detect button to determine how many seconds constitute 1 GOP.
-> 初期設定では 1 GOP = 0.5 秒としていますが、Auto‑detectボタンで1 GOPが何秒であるか判定できます。
+* Tested with MITSUBA EDR-22G
+* Select a folder → auto‑group MP4s by prefix (e.g., `F_20250828184000`) → pick a group → cut 1 GOP from every file except the first → concat with ffmpeg **without re‑encode**.*
+* The default setting is 1 GOP = 0.5 seconds, but you can use the Auto-detect button to determine how many seconds constitute 1 GOP.
+
+* MITSUBA  EDR-22Gでテスト済
+* フォルダを選択 → MP4ファイルをプレフィックスで自動グループ化 (例: `F_20250828184000`) → グループを選択 → 先頭ファイルを除く全ファイルから1 GOPをカット → ffmpegで**再エンコードなしで**結合*
+* 初期設定では 1 GOP = 0.5 秒としていますが、Auto‑detectボタンで1 GOPが何秒であるか判定できます。
+
 ---
 
 ## 1) Project Layout

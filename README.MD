@@ -13,7 +13,7 @@
 ## 1) インストール方法
 
 * Windows インストーラー版をダウンロードして起動してください。
-** [Dashcam-Joiner-Setup-0.3.4.exe](https://github.com/daig0rian/dashcam-joiner/releases/download/v0.3.4/Dashcam-Joiner-Setup-0.3.4.exe)
+* [Dashcam-Joiner-Setup-0.3.4.exe](https://github.com/daig0rian/dashcam-joiner/releases/download/v0.3.4/Dashcam-Joiner-Setup-0.3.4.exe)
 * インストーラーを使わないポータブル版はReleasesのページにあります。
 * いずれも最初の起動は少し時間がかかるので注意。FFMpegの展開に時間がかかるようです。
 
@@ -46,12 +46,10 @@ Please report whether it worked or didn't work in the issues section—it helps.
 
 ## 1) Installation Method
 
-Download and install the Windows installer version from the releases page.
-[Releases](releases)
-
-Windows Installer Version
-　Dashcam-Joiner-Setup-x.x.x.exe
-
+* Download and run the Windows installer version.
+* [Dashcam-Joiner-Setup-0.3.4.exe](https://github.com/daig0rian/dashcam-joiner/releases/download/v0.3.4/Dashcam-Joiner-Setup-0.3.4.exe)
+* The portable version without an installer is available on the Releases page.
+* Note that the first launch may take a while for both versions. It seems FFMpeg takes time to expand.
 
 ## 2) Usage
 

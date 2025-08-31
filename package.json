@@ -1,6 +1,6 @@
 {
   "name": "dashcam-joiner",
-  "version": "0.2.0",
+  "version": "0.3.4",
   "private": true,
   "description": "Electron front-end for ffmpeg: cut first GOP from each clip and losslessly concat dashcam files.",
   "main": "main.js",

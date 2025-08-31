@@ -3,8 +3,16 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
-const ffmpegPath = require('ffmpeg-static');
-const ffprobePath = require('ffprobe-static').path;
+const ffmpegPathRaw  = require('ffmpeg-static');
+const ffprobePathRaw = require('ffprobe-static').path;
+
+function deAsar(p) {
+  // パッケージ後は app.asar -> app.asar.unpacked に置換
+  return p ? p.replace('app.asar', 'app.asar.unpacked') : p;
+}
+
+const ffmpegPath  = deAsar(ffmpegPathRaw);
+const ffprobePath = deAsar(ffprobePathRaw);
 
 if (!ffmpegPath) {
   console.error('ffmpeg binary not found via ffmpeg-static');

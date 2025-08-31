@@ -1,63 +1,69 @@
-# Dashcam Joiner (Electron + ffmpeg) — 1‑GOP cut, lossless concat
-# ドラレコ結合ツール (Electron + ffmpeg) — 1-GOP 単位のカット、ロスレス結合
+# ドラレコ録画ファイル結合ツール Dashcam-Joiner - 1-GOP単位のカット、ロスレス結合
 
-* Tested with MITSUBA EDR-22G
-* Select a folder → auto‑group MP4s by prefix (e.g., `F_20250828184000`) → pick a group → cut 1 GOP from every file except the first → concat with ffmpeg **without re‑encode**.*
-* The default setting is 1 GOP = 0.5 seconds, but you can use the Auto-detect button to determine how many seconds constitute 1 GOP.
+## はじめに
+このツールミツバサンコーワ(MITSUBA)の バイク用ドラレコ EDR シリーズの30秒ごとの録画ファイルをつなげて１つのファイルにするためのツールです。公式プレイヤーでも同じことができますが、サクサクやりたかったのでツールにしました。
 
-* MITSUBA  EDR-22Gでテスト済
-* フォルダを選択 → MP4ファイルをプレフィックスで自動グループ化 (例: `F_20250828184000`) → グループを選択 → 先頭ファイルを除く全ファイルから1 GOPをカット → ffmpegで**再エンコードなしで**結合*
-* 初期設定では 1 GOP = 0.5 秒としていますが、Auto‑detectボタンで1 GOPが何秒であるか判定できます。
+もしかしたら別のドラレコにも使えるかもしれませんが、使えなくてもサポートできません。
+使えたよ、使えなかったよ、の情報は issues に書いてもらえると参考になります。
 
----
+* MITSUBA  EDR-22G の録画ファイルでテスト済
+* 単純結合だと重複してしまう各ファイルの重複部分をカットして結合
+* 再エンコードなしで、高速、ロスレス結合。
 
-## 1) Project Layout
+## 1) インストール方法
 
-```
-dashcam-joiner/
-  package.json
-  main.js
-  preload.js
-  renderer.html
-  renderer.js
-  styles.css
-```
+リリースページからWindows インストーラー版をダウンロードしてインストールしてください。
+[Releases](releases)
 
----
-
-## 2) How it works
-
-1. **Folder choose** → Main lists all `*.mp4` in the directory and groups by the first two tokens split by `_` (e.g., `F_20250828184000`).
-2. Choose a **group** → Files are lexicographically sorted (your naming scheme keeps them chronological).
-3. Set **GOP seconds** (default 0.500) → The app writes a `concat` list file where **first file is uncut**, and **2nd+ files** get `inpoint {GOP}` lines.
-4. ffmpeg runs: `ffmpeg -y -f concat -safe 0 -i list.txt -c copy output.mp4` → **no re-encode**, fast and lossless.
+Windows インストーラー版
+　Dashcam-Joiner-Setup-x.x.x.exe
 
 
-1. **フォルダ選択** → ディレクトリ内の全 `*.mp4` ファイルを表示し、`_` で区切られた最初の2つのトークン（例: `F_20250828184000`）でグループ分けします。
-2. **グループ**を選択 → ファイルは辞書順でソートされます（命名規則により時系列順に保たれます）。
-3. **GOP秒数**を設定（デフォルト0.500） → アプリは`concat`リストファイルを作成し、**最初のファイルは未編集のまま**、**2番目以降のファイル**には`inpoint {GOP}`行が追加されます。
-4. ffmpeg実行: `ffmpeg -y -f concat -safe 0 -i list.txt -c copy output.mp4` → **再エンコード不要**、高速かつロスレス。
+## 2) 使い方
+
+1. Dashcam-Joinerを起動
+2. SDカードをPCにさす。
+3. **Choose Folder…**　で、つなげたい録画ファイルがあるフォルダを選択。
+4. **Groups**に表示された録画のグループを選択。
+5. **GOP seconds:** で重複部分の秒数を設定（デフォルト0.500秒）。EDRシリーズの場合先頭1GOP分が重複しその長さは 0.500 s となります。ほかのドラレコの場合はAuto-Detectボタンを押すことで自動的に1GOP分が設定されます。
+6. **Save As...** で保存先を指定
+7. **Start Merge** で動画結合開始。
+8. **Logs** に進捗と結果が表示されます。
+
+このプログラムはChatGPT5によりすべて書かれました
 
 ---
 
-## 3) Install & Run
+# "Dashcam-Joiner" Dashcam Recording File Merge Tool  - 1-GOP Unit Cutting, Lossless Merging
 
-You can download the installer for windows from the release page.
-リリースページからWindows用インストーラーがダウンロードできます。
-https://github.com/daig0rian/dashcam-joiner/releases
+## Introduction
+This tool merges the 30-second recording files from MITSUBA EDR series motorcycle dashcams into a single file. While the official player can do the same, I made this tool for faster, smoother processing.
 
-To run from source code, execute the following on a PC with Node.js installed:
-ソースコードから動かす場合はnode.js をインストールしたPCで以下を実行:
+It might work with other dashcams, but I can't provide support if it doesn't.
+Please report whether it worked or didn't work in the issues section—it helps.
 
-```bash
-npm install
-npm run start
-```
+* Tested with MITSUBA EDR-22G recording files
+* Cut out duplicate sections from each file that would otherwise be duplicated when simply combined
+* Fast, lossless joining without re-encoding.
 
----
+## 1) Installation Method
 
-## 4) Known limitations
+Download and install the Windows installer version from the releases page.
+[Releases](releases)
 
-* `concat` demuxer の `inpoint` は **GOP 境界（キーフレーム）で最も安定**します。MITSUBA EDRでは 各ファイル先頭 = I フレームなおで問題ありません。
+Windows Installer Version
+　Dashcam-Joiner-Setup-x.x.x.exe
 
----
+
+## 2) Usage
+
+1. Launch Dashcam-Joiner
+2. Insert the SD card into your PC.
+3. Select the folder containing the recording files you want to join via **Choose Folder…**.
+4. Select the recording group displayed under **Groups**.
+5. Set the duplicate section duration in **GOP seconds:** (default 0.500 seconds). For EDR series, the first 1 GOP overlaps, with a length of 0.500 s. For other dashcams, press the Auto-Detect button to automatically set 1 GOP.
+6. Specify the save location using **Save As...**
+7. Start video merging with **Start Merge**.
+8. Progress and results are displayed in **Logs**.
+
+This program was written entirely by ChatGPT5.

@@ -12,12 +12,10 @@
 
 ## 1) インストール方法
 
-リリースページからWindows インストーラー版をダウンロードしてインストールしてください。
-[Releases](releases)
-
-Windows インストーラー版
-　Dashcam-Joiner-Setup-x.x.x.exe
-
+* Windows インストーラー版をダウンロードして起動してください。
+** [Dashcam-Joiner-Setup-0.3.4.exe](https://github.com/daig0rian/dashcam-joiner/releases/download/v0.3.4/Dashcam-Joiner-Setup-0.3.4.exe)
+* インストーラーを使わないポータブル版はReleasesのページにあります。
+* いずれも最初の起動は少し時間がかかるので注意。FFMpegの展開に時間がかかるようです。
 
 ## 2) 使い方
 

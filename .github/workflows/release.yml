@@ -1,49 +1,45 @@
-name: Build & Release (Windows)
+name: Build & Publish (Windows via electron-builder)
 
 on:
   push:
     tags:
-      - 'v*'   # v0.3.0 などのタグを push すると発火
+      - 'v*'   # v0.3.0 のようなタグで発火
+
+permissions:
+  contents: write   # GH_TOKEN で Release 作成・アップロードに必要
+
+concurrency:
+  group: windows-publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-win:
-    runs-on: windows-latest
+  win:
+    runs-on: windows-2025   # もしくは windows-2022 に固定してもOK
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install deps
+      # lock がある前提（ない場合は npm install に切り替えてください）
+      - name: Install deps (deterministic)
         run: npm ci
 
-      - name: Build (electron-builder)
+      # electron-builder に「ビルド＋公開」まで任せる
+      # package.json の scripts.dist が "electron-builder --win" である想定
+      # ※ 公開先はデフォルトで GitHub。releaseType を draft/prerelease にしたい場合は package.json の build.publish を設定してください。
+      - name: Build & Publish
         run: npm run dist
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-dist
-          path: dist/**
-
-  release:
-    needs: build-win
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-dist
-          path: dist
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.exe
-            dist/*.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # Actions が自動供給するトークン
+
+      # （任意）成果物を Actions の Artifacts にも残したいときは下をアンコメント
+      # - name: Upload artifacts (optional)
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: windows-dist
+      #     path: dist/**

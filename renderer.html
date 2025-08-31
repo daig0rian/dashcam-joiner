@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashcam Joiner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Dashcam Joiner (1‑GOP cut, lossless concat)</h1>
+    <button id="btnChoose">Choose Folder…</button>
+  </header>
+
+  <section id="groups" class="panel">
+    <h2>Groups</h2>
+    <div id="groupList" class="list"></div>
+  </section>
+
+  <section id="files" class="panel">
+    <h2>Files in selected group</h2>
+    <div class="controls">
+      <label>GOP seconds: <input id="gopSec" type="number" min="0" step="0.001" value="0.500" /></label>
+      <button id="btnSave">Save As…</button>
+      <button id="btnMerge" disabled>Start Merge</button>
+    </div>
+    <ol id="fileList"></ol>
+  </section>
+
+  <section id="log" class="panel">
+    <h2>Log</h2>
+    <pre id="console"></pre>
+  </section>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

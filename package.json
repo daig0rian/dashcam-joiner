@@ -6,12 +6,39 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack": "electron-packager . dashcam-joiner --platform=win32 --arch=x64 --overwrite"
+    "pack": "electron-packager . dashcam-joiner --platform=win32 --arch=x64 --overwrite",
+    "dist": "electron-builder --win"
   },
   "dependencies": {
-    "electron": "^30.0.0",
     "ffmpeg-static": "^5.2.0",
     "ffprobe-static": "^3.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.daigorian.dashcamjoiner",
+    "productName": "Dashcam Joiner",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.html",
+      "renderer.js",
+      "styles.css",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {"target": "nsis", "arch": ["x64"]},
+        {"target": "portable", "arch": ["x64"]}
+      ]
+    },
+    "extraMetadata": {
+      "ffmpeg-static": true,
+      "ffprobe-static": true
+    }
+  }
 }

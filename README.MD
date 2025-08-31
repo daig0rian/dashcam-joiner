@@ -1,9 +1,12 @@
 # Dashcam Joiner (Electron + ffmpeg) — 1‑GOP cut, lossless concat
-
+# ドラレコ結合ツール (Electron + ffmpeg) — 1-GOP 単位のカット、ロスレス結合
+*Tested with MITSUBA EDR-22G
+*MITSUBA  EDR-22Gでテスト済
 *Select a folder → auto‑group MP4s by prefix (e.g., `F_20250828184000`) → pick a group → cut 1 GOP from every file except the first → concat with ffmpeg **without re‑encode**.*
+*フォルダを選択 → MP4ファイルをプレフィックスで自動グループ化 (例: `F_20250828184000`) → グループを選択 → 先頭ファイルを除く全ファイルから1 GOPをカット → ffmpegで**再エンコードなしで**結合*
 
-> 初期設定では 1 GOP = 0.5 秒。必要なら UI から変更できます。
-
+> The default setting is 1 GOP = 0.5 seconds, but you can use the Auto-detect button to determine how many seconds constitute 1 GOP.
+> 初期設定では 1 GOP = 0.5 秒としていますが、Auto‑detectボタンで1 GOPが何秒であるか判定できます。
 ---
 
 ## 1) Project Layout
@@ -27,55 +30,32 @@ dashcam-joiner/
 3. Set **GOP seconds** (default 0.500) → The app writes a `concat` list file where **first file is uncut**, and **2nd+ files** get `inpoint {GOP}` lines.
 4. ffmpeg runs: `ffmpeg -y -f concat -safe 0 -i list.txt -c copy output.mp4` → **no re-encode**, fast and lossless.
 
-> 要求：ファイル先頭が **I フレーム**であること（今回のドラレコは OK）。
+
+1. **フォルダ選択** → ディレクトリ内の全 `*.mp4` ファイルを表示し、`_` で区切られた最初の2つのトークン（例: `F_20250828184000`）でグループ分けします。
+2. **グループ**を選択 → ファイルは辞書順でソートされます（命名規則により時系列順に保たれます）。
+3. **GOP秒数**を設定（デフォルト0.500） → アプリは`concat`リストファイルを作成し、**最初のファイルは未編集のまま**、**2番目以降のファイル**には`inpoint {GOP}`行が追加されます。
+4. ffmpeg実行: `ffmpeg -y -f concat -safe 0 -i list.txt -c copy output.mp4` → **再エンコード不要**、高速かつロスレス。
 
 ---
 
 ## 3) Install & Run
+
+You can download the installer for windows from the release page.
+リリースページからWindows用インストーラーがダウンロードできます。
+https://github.com/daig0rian/dashcam-joiner/releases
+
+To run from source code, execute the following on a PC with Node.js installed:
+ソースコードから動かす場合はnode.js をインストールしたPCで以下を実行:
 
 ```bash
 npm install
 npm run start
 ```
 
-> Windows で SmartScreen が警告する場合、`electron-packager` の `pack` スクリプトでローカル配布用EXEを生成できます（コード署名は省略）。
-
 ---
 
-## 4) Tweaks / Options
+## 4) Known limitations
 
-* **Grouping rule** を変えたい場合は `main.js:listMp4Groups()` のキー生成ロジックを書き換え。
-* **GOP 秒数の自動推定**：
-
-  * ffprobe を呼んで `avg_frame_rate` を取得し、I/P パターンから GOP フレーム数（例: 14）をかけて `gopSec = GOP / fps` を計算する実装も可能です（必要なら追記します）。
-* **Progress**：stderr の進捗ログをパースしてプログレスバー表示も可能です。
-* **Cross‑platform**：ffmpeg-static は macOS/Linux でも動作。UI はそのまま動きます。
-
----
-
-## 5) Known limitations
-
-* `concat` demuxer の `inpoint` は **GOP 境界（キーフレーム）で最も安定**します。今回の前提（各ファイル先頭 = I フレーム）では問題ありません。
-* 一部機種で音声トラックが変動する場合は `-c copy` が失敗することがあります。その際は再エンコードモードを別途実装してください（ご希望なら追加します）。
-
----
-
-## 6) Quick test without Electron
-
-スクリプト無しで ffmpeg の動作を確認するには、手動で `list.txt` を作成：
-
-```
-file 'A.mp4'
-file 'B.mp4'
-inpoint 0.500
-file 'C.mp4'
-inpoint 0.500
-```
-
-実行：
-
-```
-ffmpeg -y -f concat -safe 0 -i list.txt -c copy out.mp4
-```
+* `concat` demuxer の `inpoint` は **GOP 境界（キーフレーム）で最も安定**します。MITSUBA EDRでは 各ファイル先頭 = I フレームなおで問題ありません。
 
 ---
